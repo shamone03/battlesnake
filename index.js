@@ -175,10 +175,11 @@ function move(gameState) {
     // choose lowest neighbour
     // if hunger
     if (snakeStates[snakeState] === "Hunger") {
-        
-        for (let i = 0; i < possibleMoves.length; i++) {
 
-            possibleMoves[i].combinedHunger = possibleMoves[i].f / possibleMoves[i].combinedSurvive;
+        for (let i = 0; i < possibleMoves.length; i++) {
+            for (let j = 0; j < gameState.board.food.length; j++) {
+                possibleMoves[i].combinedHunger = Math.min(possibleMoves[i].f, distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), possibleMoves[i].coord)) + possibleMoves[i].snakePercent * 22;
+            }
 
             if (possibleMoves[i].combinedHunger < bestMove.combinedHunger) {
                 bestMove = possibleMoves[i];
