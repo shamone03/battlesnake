@@ -196,7 +196,7 @@ function move(gameState) {
     }
     
     for (let i = 0; i < possibleMoves.length; i++) {
-        process.stdout.write(`${possibleMoves[i].move}: ${Math.round(possibleMoves[i].combinedSurvive}`);
+        process.stdout.write(`${possibleMoves[i].move}: ${possibleMoves[i].combinedSurvive}`);
     }
     console.log();
     
