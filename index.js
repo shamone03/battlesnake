@@ -185,7 +185,7 @@ function move(gameState) {
     if (snakeStates[snakeState] === "Survive") {
 
         for (let i = 0; i < neighbours.length; i++) {
-            if (bestNeighbour.combinedSurvive < neighbours[i].combinedSurvive) {
+            if (bestNeighbour.snakeDist > neighbours[i].snakeDist && bestNeighbour.snakePercent < neighbours[i].snakePercent) {
                 bestNeighbour = neighbours[i];
             }
 
