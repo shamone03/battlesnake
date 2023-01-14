@@ -195,10 +195,10 @@ function move(gameState) {
         
     }
     
-    // for (let i = 0; i < possibleMoves.length; i++) {
-    //     process.stdout.write(`${possibleMoves[i].move}: ${Math.round(possibleMoves[i].snakePercent * 100) / 100}`);
-    // }
-    // console.log();
+    for (let i = 0; i < possibleMoves.length; i++) {
+        process.stdout.write(`${possibleMoves[i].move}: ${Math.round(possibleMoves[i].combinedSurvive}`);
+    }
+    console.log();
     
     console.log(bestMove);
     
