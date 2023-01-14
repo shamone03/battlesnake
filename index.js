@@ -159,7 +159,7 @@ function move(gameState) {
     }
 
     for (let i = 0; i < neighbours.length; i++) {
-        neighbours[i].combinedSurvive = (neighbours[i].snakePercent * (gameState.board.height + gameState.board.width)) - neighbours[i].snakeDist;
+        neighbours[i].combinedSurvive = Math.abs((neighbours[i].snakePercent * (gameState.board.height + gameState.board.width)) - neighbours[i].snakeDist);
     }
 
     let bestNeighbour = neighbours[0];
