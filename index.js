@@ -159,7 +159,13 @@ function move(gameState) {
             }
         }
     }
-    
+
+    for (let i = 0; i < possibleMoves.length; i++) {
+        for (let j = 0; j < gameState.board.food.length; j++) {
+            possibleMoves[i].f = Math.min(distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), possibleMoves[i].coord));
+        }
+    }
+
     let bestMove = possibleMoves[0];
     // console.log(snakeStates[snakeState]);
     
@@ -168,10 +174,9 @@ function move(gameState) {
     if (snakeStates[snakeState] === "Hunger") {
         
         for (let i = 0; i < possibleMoves.length; i++) {
-            for (let j = 0; j < gameState.board.food.length; j++) {
-                possibleMoves[i].combinedHunger = Math.min(possibleMoves[i].f, distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), possibleMoves[i].coord)) + possibleMoves[i].snakePercent * (gameState.board.height + gameState.board.width)
-            }
-            
+
+            possibleMoves[i].combinedHunger = possibleMoves[i].f * possibleMoves[i].snakePercent;
+
             if (possibleMoves[i].combinedHunger < bestMove.combinedHunger) {
                 bestMove = possibleMoves[i];
             }
