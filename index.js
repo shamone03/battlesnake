@@ -62,7 +62,7 @@ function move(gameState) {
     let satisfiedLen = 4;
 
     // choose lowest direction
-    // console.log(gameState.turn)
+    console.log(gameState.turn)
     let hazards = [];
     // create hazards array
     for (let i = 0; i < gameState.board.hazards.length; i++) {
