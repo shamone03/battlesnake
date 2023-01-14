@@ -88,10 +88,10 @@ function move(gameState) {
     }
     
     let possibleMoves = [
-        {snakeDist: 999, snakePercent: 1, f: 999, combinedHunger: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y + 1), move: "up"},
-        {snakeDist: 999, snakePercent: 1, f: 999, combinedHunger: 999, coord: new Coord(gameState.you.head.x + 1, gameState.you.head.y), move: "right"},
-        {snakeDist: 999, snakePercent: 1, f: 999, combinedHunger: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y - 1), move: "down"},
-        {snakeDist: 999, snakePercent: 1, f: 999, combinedHunger: 999, coord: new Coord(gameState.you.head.x - 1, gameState.you.head.y), move: "left"}
+        {snakeDist: 999, snakePercent: 1, f: 999, combinedSurvive: 999,combinedHunger: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y + 1), move: "up"},
+        {snakeDist: 999, snakePercent: 1, f: 999, combinedSurvive: 999,combinedHunger: 999, coord: new Coord(gameState.you.head.x + 1, gameState.you.head.y), move: "right"},
+        {snakeDist: 999, snakePercent: 1, f: 999, combinedSurvive: 999,combinedHunger: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y - 1), move: "down"},
+        {snakeDist: 999, snakePercent: 1, f: 999, combinedSurvive: 999,combinedHunger: 999, coord: new Coord(gameState.you.head.x - 1, gameState.you.head.y), move: "left"}
     ];
     
     // remove invalid possibleMoves
@@ -160,7 +160,7 @@ function move(gameState) {
         }
     }
     
-    let bestNeighbour = possibleMoves[0];
+    let bestMove = possibleMoves[0];
     // console.log(snakeStates[snakeState]);
     
     // choose lowest neighbour
@@ -169,11 +169,11 @@ function move(gameState) {
         
         for (let i = 0; i < possibleMoves.length; i++) {
             for (let j = 0; j < gameState.board.food.length; j++) {
-                possibleMoves[i].combinedHunger = Math.min(possibleMoves[i].f, distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), possibleMoves[i].coord)) + possibleMoves[i].snakePercent * 22;
+                possibleMoves[i].combinedHunger = Math.min(possibleMoves[i].f, distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), possibleMoves[i].coord)) + possibleMoves[i].snakePercent * (gameState.board.height + gameState.board.width)
             }
             
-            if (possibleMoves[i].combinedHunger < bestNeighbour.combinedHunger) {
-                bestNeighbour = possibleMoves[i];
+            if (possibleMoves[i].combinedHunger < bestMove.combinedHunger) {
+                bestMove = possibleMoves[i];
             }
         }
     
@@ -183,13 +183,12 @@ function move(gameState) {
     if (snakeStates[snakeState] === "Survive") {
         // minimize snakePercent maximize snakeDist
 
-
         for (let i = 0; i < possibleMoves.length; i++) {
-
-            // possibleMoves[i].combinedSurvive = Math.max((possibleMoves[i].snakePercent * 22) * possibleMoves[i].snakeDist, possibleMoves[i].combinedSurvive)
-
-            if (possibleMoves[i].snakePercent < bestNeighbour.snakePercent && possibleMoves[i].snakeDist > bestNeighbour.snakeDist) {
-                bestNeighbour = possibleMoves[i];
+            possibleMoves[i].combinedSurvive = (possibleMoves[i].snakePercent * (gameState.board.height + gameState.board.width)) - possibleMoves[i].snakeDist;
+        }
+        for (let i = 0; i < possibleMoves.length; i++) {
+            if (bestMove.combinedSurvive > possibleMoves[i].combinedSurvive) {
+                bestMove = possibleMoves[i];
             }
 
         }
@@ -201,9 +200,9 @@ function move(gameState) {
     // }
     // console.log();
     
-    console.log(bestNeighbour);
+    console.log(bestMove);
     
-    return { move: bestNeighbour.move };
+    return { move: bestMove.move };
     
     
 }
