@@ -193,12 +193,12 @@ function move(gameState) {
 
     }
 
-    // for (let i = 0; i < neighbours.length; i++) {
-    //     process.stdout.write(`${neighbours[i].move}: ${Math.round(neighbours[i].snakePercent * 100) / 100}`);
-    // }
-    // console.log();
+    for (let i = 0; i < neighbours.length; i++) {
+        process.stdout.write(`${neighbours[i].move}: ${Math.round(neighbours[i].snakePercent * 100) / 100}`);
+    }
+    console.log();
 
-    // console.log(bestNeighbour);
+    console.log(bestNeighbour);
 
     return { move: bestNeighbour.move };
 
