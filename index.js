@@ -171,7 +171,7 @@ function move(gameState) {
 
         for (let i = 0; i < neighbours.length; i++) {
             for (let j = 0; j < gameState.board.food.length; j++) {
-                neighbours[i].combined = Math.min(neighbours[i].f, distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), neighbours[i].coord));
+                neighbours[i].combined = Math.min(neighbours[i].f, distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), neighbours[i].coord)) + neighbours[i].snakePercent * 22;
             }
 
             if (neighbours[i].combined < bestNeighbour.combined) {
@@ -188,12 +188,13 @@ function move(gameState) {
             if (bestNeighbour.snakeDist > neighbours[i].snakeDist && bestNeighbour.snakePercent < neighbours[i].snakePercent) {
                 bestNeighbour = neighbours[i];
             } else {
+                if (bestNeighbour.snakePercent > neighbours[i].snakePercent) {
+                    bestNeighbour = neighbours[i]
+                } else
                 if (bestNeighbour.snakeDist > neighbours[i].snakeDist) {
                     bestNeighbour = neighbours[i]
                 }
-                if (bestNeighbour.snakePercent > neighbours[i].snakePercent) {
-                    bestNeighbour = neighbours[i]
-                }
+
             }
 
         }
