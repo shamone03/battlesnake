@@ -88,10 +88,10 @@ function move(gameState) {
     }
     
     let possibleMoves = [
-        {snakeDist: 999, snakePercent: 1, f: 999, combinedSurvive: -1, combinedHunger: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y + 1), move: "up"},
-        {snakeDist: 999, snakePercent: 1, f: 999, combinedSurvive: -1, combinedHunger: 999, coord: new Coord(gameState.you.head.x + 1, gameState.you.head.y), move: "right"},
-        {snakeDist: 999, snakePercent: 1, f: 999, combinedSurvive: -1, combinedHunger: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y - 1), move: "down"},
-        {snakeDist: 999, snakePercent: 1, f: 999, combinedSurvive: -1, combinedHunger: 999, coord: new Coord(gameState.you.head.x - 1, gameState.you.head.y), move: "left"}
+        {snakeDist: 999, snakePercent: 1, f: 999, combinedHunger: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y + 1), move: "up"},
+        {snakeDist: 999, snakePercent: 1, f: 999, combinedHunger: 999, coord: new Coord(gameState.you.head.x + 1, gameState.you.head.y), move: "right"},
+        {snakeDist: 999, snakePercent: 1, f: 999, combinedHunger: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y - 1), move: "down"},
+        {snakeDist: 999, snakePercent: 1, f: 999, combinedHunger: 999, coord: new Coord(gameState.you.head.x - 1, gameState.you.head.y), move: "left"}
     ];
     
     // remove invalid possibleMoves
@@ -186,9 +186,9 @@ function move(gameState) {
 
         for (let i = 0; i < possibleMoves.length; i++) {
 
-            possibleMoves[i].combinedSurvive = Math.max((possibleMoves[i].snakePercent * 22) - possibleMoves[i].snakeDist, possibleMoves[i].combinedSurvive)
+            // possibleMoves[i].combinedSurvive = Math.max((possibleMoves[i].snakePercent * 22) * possibleMoves[i].snakeDist, possibleMoves[i].combinedSurvive)
 
-            if (possibleMoves[i].combinedSurvive < bestNeighbour.combinedSurvive) {
+            if (possibleMoves[i].snakePercent < bestNeighbour.snakePercent && possibleMoves[i].snakeDist > bestNeighbour.snakeDist) {
                 bestNeighbour = possibleMoves[i];
             }
 
