@@ -41,58 +41,6 @@ function end(gameState) {
 // Valid moves are "up", "down", "left", or "right"
 // See https://docs.battlesnake.com/api/example-move for available data
 
-class Node {
-    // g dist from start node
-    // h dist from end node
-    // f = g + h
-    constructor(g, h, type) {
-        this.g = g;
-        this.h = h;
-        this.f = g + h;
-        this.type = type;
-        
-    }
-
-    equals(x, y) {
-        return this.x === x && this.y === y;
-    }
-
-    
-
-}
-
-// function distance(startX, startY, endX, endY) {
-//     return Math.abs(endX - startX) + Math.abs(endY - startY);
-// }
-
-function setStartingWeights(gameState, board) {
-    
-    for (let i = 0; i < gameState.board.food.length; i++) {
-        let x = gameState.board.food[i].x;
-        let y = (gameState.board.height - 1) - gameState.board.food[i].y;
-
-        board[y][x] = new Node(50, 50, "F");
-        
-    }
-
-    for (let i = 0; i < gameState.board.hazards.length; i++) {
-        let x = gameState.board.hazards[i].x;
-        let y = (gameState.board.height - 1) - gameState.board.hazards[i].y;
-
-        board[y][x] = new Node(50, 50, "H");
-    }
-
-    for (let i  = 0; i < gameState.board.snakes.length; i++) {
-
-        for (let j = 0; j < gameState.board.snakes[i].body.length; j++) {
-            let x = gameState.board.snakes[i].body[j].x;
-            let y = (gameState.board.height - 1) - gameState.board.snakes[i].body[j].y;
-
-            board[y][x] = new Node(50, 50, "S");
-        }
-    }
-}
-
 function distance(a, b) {
     return Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
 }
@@ -107,28 +55,23 @@ class Coord {
         return this.x === coord.x && this.y === coord.y;
     }
 }
-
+// https://docs.battlesnake.com/api/example-move
 function move(gameState) {
     // choose lowest direction
     // break epsilon ties by checking other snakes/hazards
     console.log(gameState.turn)
     let hazards = [];
-    
-
+    // create hazards array
     for (let i = 0; i < gameState.board.hazards.length; i++) {
         hazards.push(new Coord(gameState.board.hazards[i].x, gameState.board.hazards[i].y));
     }
-
     for (let i = 0; i < gameState.board.snakes.length; i++) {
         for (let j = 0; j < gameState.board.snakes[i].body.length; j++) {
             hazards.push(new Coord(gameState.board.snakes[i].body[j].x, gameState.board.snakes[i].body[j].y));
         }
     }
     
-    console.log("hazards: ");
-    for (let i = 0; i < hazards.length; i++) {
-        console.log(hazards[i].x + ' ' + hazards[i].y);
-    }
+    
     
     let neighbours = [
         {f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y + 1), move: "up"},
@@ -136,152 +79,36 @@ function move(gameState) {
         {f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y - 1), move: "down"},
         {f: 999, coord: new Coord(gameState.you.head.x - 1, gameState.you.head.y), move: "left"}
     ];
-    console.log("neighbours: ");
-    for (let i = 0; i < neighbours.length; i++) {
-        console.log(neighbours[i].coord.x + ' ' + neighbours[i].coord.y);
-    }
-    // neighbours = neighbours.filter(e => e.coord.x < 0 || e.coord.x > (gameState.board.width - 1) || e.coord.y < 0 || e.coord.y > (gameState.board.height - 1));
     
-    // for (let i = 0; i < hazards.length; i++) {
-    //     neighbours = neighbours.filter(e => e.equals(hazards[i]));
-    // }
-    for (let i = 0; i < hazards.length; i++) {
-        
-        neighbours = neighbours.filter(e => e.coord.equals(hazards[i]));
-    }
+    // remove invalid neighbours 
+    neighbours = neighbours.filter(e => !(e.coord.x < 0 || e.coord.x > (gameState.board.width - 1) || e.coord.y < 0 || e.coord.y > (gameState.board.height - 1)));
+    neighbours = neighbours.filter(e => !hazards.find(h => h.equals(e.coord)));
     
-
+    
     let lowestNeighbour = neighbours[0];
-    console.log("neighbours after filter: ");
-    for (let i = 0; i < neighbours.length; i++) {
-        console.log(neighbours[i].coord.x + ' ' + neighbours[i].coord.y);
-    }
     
+    // choose lowest neighbour
     for (let i = 0; i < neighbours.length; i++) {
         for (let j = 0; j < gameState.board.food.length; j++) {
             neighbours[i].f = Math.min(neighbours[i].f, distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), neighbours[i].coord));
         }
 
         if (neighbours[i].f < lowestNeighbour.f) {
-            // if (!hazards.find(e => e.equals(neighbours[i].coord))) {
-            // }
+
             lowestNeighbour = neighbours[i];
             
         }
         
     }
     
-    
     console.log(lowestNeighbour)
+
+    
     
     return { move: lowestNeighbour.move };
     
 }
 
-// function move(gameState) {
-//     let board = new Array(gameState.board.height).fill(new Node(50, 50, "O")).map(() => new Array(gameState.board.width).fill(new Node(50, 50, "O")));
-    
-//     let hazards = [];
-
-//     setStartingWeights();
-    
-//     for (let i = 0; i < gameState.board.hazards.length; i++) {
-//         hazards.push(board[(gameState.board.height - 1) - gameState.board.hazards[i].y][gameState.board.hazards[i].x]);
-//     }
-    
-//     for (let i  = 0; i < gameState.board.snakes.length; i++) {
-//         for (let j = 0; j < gameState.board.snakes[i].body.length; j++) {
-//             hazards.push(board[(gameState.board.height - 1) - gameState.board.snakes[i].body[j].y][gameState.board.snakes[i].body[j].x]);
-//         }
-//     }
-
-//     let neighbours = [{node: board[current.y + 1][current.x], x: current.x, y: current.y + 1},
-//                       {node: board[current.y][current.x + 1], x: current.x + 1, y: current.y},
-//                       {node: board[current.y + 1][current.x], x: current.x, y: current.y + 1},
-//                       {node: board[current.y][current.x - 1], x: current.x - 1, y: current.y}];
-//     let lowestF = 999;
-//     let move = ["up", "right", "down", "left"];
-//     for (let i = 0; i < neighbours.length; i++) {
-//         if (neighbours[i].f < lowestF) {
-            
-//         }
-//     }
-    
-// }
-
-// function move(gameState) {
-
-//     let board = new Array(gameState.board.height).fill(new Node(50, 50, "O")).map(() => new Array(gameState.board.width).fill(new Node(50, 50, "O")));
-//     let open = [];
-//     let closed = [];
-//     let hazards = [];
-
-//     setStartingWeights()
-    
-//     for (let i = 0; i < gameState.board.hazards.length; i++) {
-//         hazards.push(board[(gameState.board.height - 1) - gameState.board.hazards[i].y][gameState.board.hazards[i].x]);
-//     }
-//     for (let i  = 0; i < gameState.board.snakes.length; i++) {
-//         for (let j = 0; j < gameState.board.snakes[i].body.length; j++) {
-//             hazards.push(board[(gameState.board.height - 1) - gameState.board.snakes[i].body[j].y][gameState.board.snakes[i].body[j].x]);
-//         }
-//     }
-    
-//     let closestFoodX = gameState.board.food[0].x;
-//     let closestFoodY = gameState.board.food[0].y;
-//     let lowestDist = distance(gameState.you.head.x, gameState.you.head.y, closestFoodX, closestFoodY);
-    
-//     for (let i = 0; i < gameState.board.food.length; i++) {
-//         let dist = distance(gameState.you.head.x, gameState.you.head.y, gameState.board.food[i].x, gameState.board.food[i].y);
-//         if (dist < lowestDist) {
-//             lowestDist = dist;
-//             closestFoodX = gameState.board.food[i].x;
-//             closestFoodY = gameState.board.food[i].y;
-            
-//         }
-//     }
-    
-//     // open.push(new Node(0, lowestDist, "S", gameState.you.head.x, gameState.you.head.y));
-    
-//     open.push({
-//         node: board[(gameState.board.height - 1) - gameState.you.head.y][gameState.you.head.x],
-//         x: gameState.you.head.x,
-//         y: (gameState.board.height - 1) - gameState.you.head.y
-//     });
-    
-//     // let board = new Array(gameState.board.height * gameState.board.width).fill(50, 50, "O", );
-//     while (open.length > 0) {
-//         let current = open[0];
-//         for (let i = 0; i < open.length; i++) {
-//             if (open[i].f < current.f) {
-//                 current = open[i];
-//             }
-//         }
-
-//         if (current.x === closestFoodX && current.y === closestFoodY) {
-//             return;
-//         }
-
-//         let neighbours = [{node: board[current.y - 1][current.x], x: current.x, y: current.y - 1},
-//                           {node: board[current.y + 1][current.x], x: current.x, y: current.y + 1},
-//                           {node: board[current.y][current.x - 1], x: current.x - 1, y: current.y},
-//                           {node: board[current.y][current.x - 1], x: current.x + 1, y: current.y}]
-                          
-
-//         for (let i = 0; i < neighbours.length; i++) {
-//             if (hazards.find(e => e.x === neighbours[i].x && e.y === neighbours[i].y) || closed.find(e => e.x === neighbours[i].x && e.y === neighbours[i].y)) {
-//                 continue;
-//             }
-//             let newDist = distance(current.x, current.y, neighbours[i].x, neighbours[i].y);
-            
-//             if (newDist < neighbours[i].node.f || !open.find(e => e.x === neighbours[i].x && e.y === neighbours[i].y)) {
-//                 neighbours[i].f = newDist;
-                
-//             }
-            
-//         }
-//     }
-// }
 
 
 runServer({
