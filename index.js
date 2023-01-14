@@ -80,7 +80,7 @@ function move(gameState) {
 
     if (gameState.you.length >= satisfiedLen) {
         snakeState = 1;
-        if (gameState.you.health < 50) {
+        if (gameState.you.health < 25) {
             snakeState = 0;
         }
     } else {
@@ -88,15 +88,61 @@ function move(gameState) {
     }
     
     let neighbours = [
-        {snakePercent: 1, f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y + 1), move: "up"},
-        {snakePercent: 1, f: 999, coord: new Coord(gameState.you.head.x + 1, gameState.you.head.y), move: "right"},
-        {snakePercent: 1, f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y - 1), move: "down"},
-        {snakePercent: 1, f: 999, coord: new Coord(gameState.you.head.x - 1, gameState.you.head.y), move: "left"}
+        {snakePercent: 1, f: 999, combined: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y + 1), move: "up"},
+        {snakePercent: 1, f: 999, combined: 999, coord: new Coord(gameState.you.head.x + 1, gameState.you.head.y), move: "right"},
+        {snakePercent: 1, f: 999, combined: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y - 1), move: "down"},
+        {snakePercent: 1, f: 999, combined: 999, coord: new Coord(gameState.you.head.x - 1, gameState.you.head.y), move: "left"}
     ];
     
     // remove invalid neighbours 
     neighbours = neighbours.filter(e => !(e.coord.x < 0 || e.coord.x > (gameState.board.width - 1) || e.coord.y < 0 || e.coord.y > (gameState.board.height - 1)));
     neighbours = neighbours.filter(e => !hazards.find(h => h.equals(e.coord)));
+
+
+    let up = 0;
+    let right = 0;
+    let down = 0;
+    let left = 0;
+    
+    let upSize = ((gameState.board.height - 1) - gameState.you.head.y) * (gameState.board.width);
+    let rightSize = ((gameState.board.width - 1) - gameState.you.head.x) * (gameState.board.height);
+    let downSize = (gameState.you.head.y) * (gameState.board.width);
+    let leftSize = (gameState.you.head.x) * (gameState.board.height);
+    
+    
+    for (let i = 0; i < hazards.length; i++) {
+        if (hazards[i].y > gameState.you.head.y) {
+            up++;
+        }
+        if (hazards[i].x > gameState.you.head.x) {
+            right++;
+        }
+        if (hazards[i].y < gameState.you.head.y) {
+            down++;
+        }
+        if (hazards[i].x < gameState.you.head.x) {
+            left++;
+        }
+    }
+    
+    let upPercent = (upSize > 0) ? (up / upSize) : 999;
+    let rightPercent = (rightSize > 0) ? (right / rightSize) : 999;
+    let downPercent = (downSize > 0) ? (down / downSize) : 999;
+    let leftPercent = (leftSize > 0) ? (left / leftSize) : 999;
+    for (let i = 0; i < neighbours.length; i++) {
+        if (neighbours[i].move === "up") {
+            neighbours[i].snakePercent = upPercent;
+        }
+        if (neighbours[i].move === "right") {
+            neighbours[i].snakePercent = rightPercent;
+        }
+        if (neighbours[i].move === "down") {
+            neighbours[i].snakePercent = downPercent;
+        }
+        if (neighbours[i].move === "left") {
+            neighbours[i].snakePercent = leftPercent;
+        }
+    }
     
     let bestNeighbour = neighbours[0];
     // console.log(snakeStates[snakeState]);
@@ -107,10 +153,10 @@ function move(gameState) {
         
         for (let i = 0; i < neighbours.length; i++) {
             for (let j = 0; j < gameState.board.food.length; j++) {
-                neighbours[i].f = Math.min(neighbours[i].f, distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), neighbours[i].coord));
+                neighbours[i].combined = Math.min(neighbours[i].f, distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), neighbours[i].coord)) + neighbours[i].snakePercent * 22;
             }
             
-            if (neighbours[i].f < bestNeighbour.f) {
+            if (neighbours[i].combined < bestNeighbour.combined) {
                 bestNeighbour = neighbours[i];
             }
         }
@@ -119,52 +165,6 @@ function move(gameState) {
 
     // current objective: survive
     if (snakeStates[snakeState] === "Survive") {
-        let up = 0;
-        let right = 0;
-        let down = 0;
-        let left = 0;
-        
-        let upSize = ((gameState.board.height - 1) - gameState.you.head.y) * (gameState.board.width);
-        let rightSize = ((gameState.board.width - 1) - gameState.you.head.x) * (gameState.board.height);
-        let downSize = (gameState.you.head.y) * (gameState.board.width);
-        let leftSize = (gameState.you.head.x) * (gameState.board.height);
-        
-        
-        for (let i = 0; i < hazards.length; i++) {
-            if (hazards[i].y > gameState.you.head.y) {
-                up++;
-            }
-            if (hazards[i].x > gameState.you.head.x) {
-                right++;
-            }
-            if (hazards[i].y < gameState.you.head.y) {
-                down++;
-            }
-            if (hazards[i].x < gameState.you.head.x) {
-                left++;
-            }
-        }
-        
-        let upPercent = (upSize > 0) ? (up / upSize) : 999;
-        let rightPercent = (rightSize > 0) ? (right / rightSize) : 999;
-        let downPercent = (downSize > 0) ? (down / downSize) : 999;
-        let leftPercent = (leftSize > 0) ? (left / leftSize) : 999;
-
-        for (let i = 0; i < neighbours.length; i++) {
-            if (neighbours[i].move === "up") {
-                neighbours[i].snakePercent = upPercent;
-            }
-            if (neighbours[i].move === "right") {
-                neighbours[i].snakePercent = rightPercent;
-            }
-            if (neighbours[i].move === "down") {
-                neighbours[i].snakePercent = downPercent;
-            }
-            if (neighbours[i].move === "left") {
-                neighbours[i].snakePercent = leftPercent;
-            }
-        }
-        
         
         for (let i = 0; i < neighbours.length; i++) {
             if (neighbours[i].snakePercent < bestNeighbour.snakePercent) {
@@ -182,6 +182,7 @@ function move(gameState) {
     // console.log(bestNeighbour);
     
     return { move: bestNeighbour.move };
+    
     
 }
 
