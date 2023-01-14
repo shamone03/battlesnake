@@ -69,15 +69,10 @@ function move(gameState) {
         hazards.push(new Coord(gameState.board.hazards[i].x, gameState.board.hazards[i].y));
     }
 
-    // body of snakes
-    let otherSnakes = [];
     
     for (let i = 0; i < gameState.board.snakes.length; i++) {
         for (let j = 0; j < gameState.board.snakes[i].body.length; j++) {
             hazards.push(new Coord(gameState.board.snakes[i].body[j].x, gameState.board.snakes[i].body[j].y));
-            if (gameState.board.snakes[i].id !== gameState.you.id) {
-                otherSnakes.push(new Coord(gameState.board.snakes[i].body[j].x, gameState.board.snakes[i].body[j].y));
-            }
         }
     }
     
@@ -91,11 +86,12 @@ function move(gameState) {
     } else {
         snakeState = 0;
     }
+    
     let neighbours = [
-        {snakeWeight: 999, f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y + 1), move: "up"},
-        {snakeWeight: 999, f: 999, coord: new Coord(gameState.you.head.x + 1, gameState.you.head.y), move: "right"},
-        {snakeWeight: 999, f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y - 1), move: "down"},
-        {snakeWeight: 999, f: 999, coord: new Coord(gameState.you.head.x - 1, gameState.you.head.y), move: "left"}
+        {snakePercent: 1, f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y + 1), move: "up"},
+        {snakePercent: 1, f: 999, coord: new Coord(gameState.you.head.x + 1, gameState.you.head.y), move: "right"},
+        {snakePercent: 1, f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y - 1), move: "down"},
+        {snakePercent: 1, f: 999, coord: new Coord(gameState.you.head.x - 1, gameState.you.head.y), move: "left"}
     ];
     
     // remove invalid neighbours 
@@ -117,34 +113,71 @@ function move(gameState) {
             if (neighbours[i].f < bestNeighbour.f) {
                 bestNeighbour = neighbours[i];
             }
-        }   
+        }
     
     }
 
     // current objective: survive
     if (snakeStates[snakeState] === "Survive") {
+        let up = 0;
+        let right = 0;
+        let down = 0;
+        let left = 0;
+        
+        let upSize = ((gameState.board.height - 1) - gameState.you.head.y) * (gameState.board.width);
+        let rightSize = ((gameState.board.width - 1) - gameState.you.head.x) * (gameState.board.height);
+        let downSize = (gameState.you.head.y) * (gameState.board.width);
+        let leftSize = (gameState.you.head.x) * (gameState.board.height);
+        
+        
+        for (let i = 0; i < hazards.length; i++) {
+            if (hazards[i].y > gameState.you.head.y) {
+                up++;
+            }
+            if (hazards[i].x > gameState.you.head.x) {
+                right++;
+            }
+            if (hazards[i].y < gameState.you.head.y) {
+                down++;
+            }
+            if (hazards[i].x < gameState.you.head.x) {
+                left++;
+            }
+        }
+        
+        let upPercent = (upSize > 0) ? (up / upSize) : 999;
+        let rightPercent = (rightSize > 0) ? (right / rightSize) : 999;
+        let downPercent = (downSize > 0) ? (down / downSize) : 999;
+        let leftPercent = (leftSize > 0) ? (left / leftSize) : 999;
 
         for (let i = 0; i < neighbours.length; i++) {
-            for (let s = 0; s < gameState.board.snakes.length; s++) {
-                for (let b = 0; b < gameState.board.snakes[s].body.length; b++) {
-                    if (gameState.board.snakes[s].id !== gameState.you.id) {
-                        let curWeight = distance(new Coord(gameState.board.snakes[s].body[b].x, gameState.board.snakes[s].body[b].y), neighbours[i].coord);
-                        // console.log(`neighbours[i]: ${neighbours[i].snakeWeight}, curWeight: ${curWeight}`);
-                        neighbours[i].snakeWeight = Math.min(neighbours[i].snakeWeight, curWeight);    
-                    }
-                    
-                    
-                }
+            if (neighbours[i].move === "up") {
+                neighbours[i].snakePercent = upPercent;
             }
-
-            if (neighbours[i].snakeWeight > bestNeighbour.snakeWeight) {
+            if (neighbours[i].move === "right") {
+                neighbours[i].snakePercent = rightPercent;
+            }
+            if (neighbours[i].move === "down") {
+                neighbours[i].snakePercent = downPercent;
+            }
+            if (neighbours[i].move === "left") {
+                neighbours[i].snakePercent = leftPercent;
+            }
+        }
+        
+        
+        for (let i = 0; i < neighbours.length; i++) {
+            if (neighbours[i].snakePercent < bestNeighbour.snakePercent) {
                 bestNeighbour = neighbours[i];
             }
-            
         }
         
     }
     
+    // for (let i = 0; i < neighbours.length; i++) {
+    //     process.stdout.write(`${neighbours[i].move}: ${Math.round(neighbours[i].snakePercent * 100) / 100}`);
+    // }
+    // console.log();
     
     // console.log(bestNeighbour);
     
