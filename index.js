@@ -80,7 +80,7 @@ function move(gameState) {
     //game state assesment
     if (gameState.you.length >= satisfiedLen) {
         snakeState = 1;
-        if (gameState.you.health < 25) {
+        if (gameState.you.health < 40) {
             snakeState = 0;
         }
     } else {
