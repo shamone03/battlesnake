@@ -161,7 +161,7 @@ function move(gameState) {
     }
 
     for (let i = 0; i < possibleMoves.length; i++) {
-        possibleMoves[i].combinedSurvive = (possibleMoves[i].snakePercent * (gameState.board.height + gameState.board.width)) - possibleMoves[i].snakeDist;
+        possibleMoves[i].combinedSurvive = Math.abs((possibleMoves[i].snakePercent * (gameState.board.height + gameState.board.width)) - possibleMoves[i].snakeDist);
     }
 
     for (let i = 0; i < possibleMoves.length; i++) {
@@ -179,7 +179,7 @@ function move(gameState) {
         
         for (let i = 0; i < possibleMoves.length; i++) {
 
-            possibleMoves[i].combinedHunger = possibleMoves[i].f * possibleMoves[i].combinedSurvive * 0.1;
+            possibleMoves[i].combinedHunger = possibleMoves[i].f / possibleMoves[i].combinedSurvive;
 
             if (possibleMoves[i].combinedHunger < bestMove.combinedHunger) {
                 bestMove = possibleMoves[i];
