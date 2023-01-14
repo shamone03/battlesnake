@@ -194,7 +194,7 @@ function move(gameState) {
 
 
         for (let i = 0; i < possibleMoves.length; i++) {
-            if (bestMove.combinedSurvive > possibleMoves[i].combinedSurvive) {
+            if (bestMove.combinedSurvive < possibleMoves[i].combinedSurvive) {
                 bestMove = possibleMoves[i];
             }
 
