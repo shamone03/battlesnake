@@ -179,7 +179,7 @@ function move(gameState) {
         
         for (let i = 0; i < possibleMoves.length; i++) {
 
-            possibleMoves[i].combinedHunger = possibleMoves[i].f * possibleMoves[i].combinedSurvive;
+            possibleMoves[i].combinedHunger = possibleMoves[i].f * possibleMoves[i].combinedSurvive * 0.1;
 
             if (possibleMoves[i].combinedHunger < bestMove.combinedHunger) {
                 bestMove = possibleMoves[i];
