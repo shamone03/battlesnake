@@ -186,7 +186,7 @@ function move(gameState) {
 
         for (let i = 0; i < possibleMoves.length; i++) {
 
-            possibleMoves[i].combinedSurvive = Math.max(possibleMoves[i].snakeDist * possibleMoves[i].snakePercent * 22, possibleMoves[i].combinedSurvive)
+            possibleMoves[i].combinedSurvive = Math.max((possibleMoves[i].snakePercent * 22) - possibleMoves[i].snakeDist, possibleMoves[i].combinedSurvive)
 
             if (possibleMoves[i].combinedSurvive < bestNeighbour.combinedSurvive) {
                 bestNeighbour = possibleMoves[i];

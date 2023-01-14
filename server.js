@@ -31,7 +31,6 @@ export default function runServer(handlers) {
   const port = process.env.PORT || 8000;
 
   app.listen(port,() => {
-    // console.log(`Running Battlesnake at http://${host}:${port}...`)
     console.log(`running on ${port}`);
   });
 }
