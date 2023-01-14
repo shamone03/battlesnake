@@ -187,6 +187,13 @@ function move(gameState) {
         for (let i = 0; i < neighbours.length; i++) {
             if (bestNeighbour.snakeDist > neighbours[i].snakeDist && bestNeighbour.snakePercent < neighbours[i].snakePercent) {
                 bestNeighbour = neighbours[i];
+            } else {
+                if (bestNeighbour.snakeDist > neighbours[i].snakeDist) {
+                    bestNeighbour = neighbours[i]
+                }
+                if (bestNeighbour.snakePercent > neighbours[i].snakePercent) {
+                    bestNeighbour = neighbours[i]
+                }
             }
 
         }
