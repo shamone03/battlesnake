@@ -59,7 +59,7 @@ class Coord {
 function move(gameState) {
     let snakeStates = ["Hunger", "Survive"];
     let snakeState = 0;
-    // let satisfiedLen = 4;
+    let satisfiedLen = 4;
     
     // choose lowest direction
     console.log(gameState.turn)
@@ -75,15 +75,9 @@ function move(gameState) {
             hazards.push(new Coord(gameState.board.snakes[i].body[j].x, gameState.board.snakes[i].body[j].y));
         }
     }
-    let sum = 0;
 
-    for (let i = 0; i < gameState.board.snakes.length; i++) {
-        sum += gameState.board.snakes[i].body.length;
-    }
 
-    let satisfiedLen = sum / gameState.board.snakes.length;
-
-    if (gameState.you.length >= satisfiedLen + 2) {
+    if (gameState.you.length >= satisfiedLen) {
         snakeState = 1;
         if (gameState.you.health < 25) {
             snakeState = 0;
