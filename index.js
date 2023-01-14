@@ -57,55 +57,98 @@ class Coord {
 }
 // https://docs.battlesnake.com/api/example-move
 function move(gameState) {
+    let snakeStates = ["Hunger", "Survive"];
+    let snakeState = 0;
+    let satisfiedLen = 4;
+    
     // choose lowest direction
-    // break epsilon ties by checking other snakes/hazards
-    console.log(gameState.turn)
+    // console.log(gameState.turn)
     let hazards = [];
     // create hazards array
     for (let i = 0; i < gameState.board.hazards.length; i++) {
         hazards.push(new Coord(gameState.board.hazards[i].x, gameState.board.hazards[i].y));
     }
+
+    // body of snakes
+    let otherSnakes = [];
+    
     for (let i = 0; i < gameState.board.snakes.length; i++) {
         for (let j = 0; j < gameState.board.snakes[i].body.length; j++) {
             hazards.push(new Coord(gameState.board.snakes[i].body[j].x, gameState.board.snakes[i].body[j].y));
+            if (gameState.board.snakes[i].id !== gameState.you.id) {
+                otherSnakes.push(new Coord(gameState.board.snakes[i].body[j].x, gameState.board.snakes[i].body[j].y));
+            }
         }
     }
     
     
-    
+
+    if (gameState.you.length >= satisfiedLen) {
+        snakeState = 1;
+        if (gameState.you.health < 50) {
+            snakeState = 0;
+        }
+    } else {
+        snakeState = 0;
+    }
     let neighbours = [
-        {f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y + 1), move: "up"},
-        {f: 999, coord: new Coord(gameState.you.head.x + 1, gameState.you.head.y), move: "right"},
-        {f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y - 1), move: "down"},
-        {f: 999, coord: new Coord(gameState.you.head.x - 1, gameState.you.head.y), move: "left"}
+        {snakeWeight: 999, f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y + 1), move: "up"},
+        {snakeWeight: 999, f: 999, coord: new Coord(gameState.you.head.x + 1, gameState.you.head.y), move: "right"},
+        {snakeWeight: 999, f: 999, coord: new Coord(gameState.you.head.x, gameState.you.head.y - 1), move: "down"},
+        {snakeWeight: 999, f: 999, coord: new Coord(gameState.you.head.x - 1, gameState.you.head.y), move: "left"}
     ];
     
     // remove invalid neighbours 
     neighbours = neighbours.filter(e => !(e.coord.x < 0 || e.coord.x > (gameState.board.width - 1) || e.coord.y < 0 || e.coord.y > (gameState.board.height - 1)));
     neighbours = neighbours.filter(e => !hazards.find(h => h.equals(e.coord)));
     
-    
-    let lowestNeighbour = neighbours[0];
+    let bestNeighbour = neighbours[0];
+    // console.log(snakeStates[snakeState]);
     
     // choose lowest neighbour
-    for (let i = 0; i < neighbours.length; i++) {
-        for (let j = 0; j < gameState.board.food.length; j++) {
-            neighbours[i].f = Math.min(neighbours[i].f, distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), neighbours[i].coord));
-        }
+    // if hunger
+    if (snakeStates[snakeState] === "Hunger") {
+        
+        for (let i = 0; i < neighbours.length; i++) {
+            for (let j = 0; j < gameState.board.food.length; j++) {
+                neighbours[i].f = Math.min(neighbours[i].f, distance(new Coord(gameState.board.food[j].x, gameState.board.food[j].y), neighbours[i].coord));
+            }
+            
+            if (neighbours[i].f < bestNeighbour.f) {
+                bestNeighbour = neighbours[i];
+            }
+        }   
+    
+    }
 
-        if (neighbours[i].f < lowestNeighbour.f) {
+    // current objective: survive
+    if (snakeStates[snakeState] === "Survive") {
 
-            lowestNeighbour = neighbours[i];
+        for (let i = 0; i < neighbours.length; i++) {
+            for (let s = 0; s < gameState.board.snakes.length; s++) {
+                for (let b = 0; b < gameState.board.snakes[s].body.length; b++) {
+                    if (gameState.board.snakes[s].id !== gameState.you.id) {
+                        let curWeight = distance(new Coord(gameState.board.snakes[s].body[b].x, gameState.board.snakes[s].body[b].y), neighbours[i].coord);
+                        // console.log(`neighbours[i]: ${neighbours[i].snakeWeight}, curWeight: ${curWeight}`);
+                        neighbours[i].snakeWeight = Math.min(neighbours[i].snakeWeight, curWeight);    
+                    }
+                    
+                    
+                }
+            }
+
+            if (neighbours[i].snakeWeight > bestNeighbour.snakeWeight) {
+                bestNeighbour = neighbours[i];
+            }
             
         }
         
     }
     
-    console.log(lowestNeighbour)
-
     
+    // console.log(bestNeighbour);
     
-    return { move: lowestNeighbour.move };
+    return { move: bestNeighbour.move };
     
 }
 
